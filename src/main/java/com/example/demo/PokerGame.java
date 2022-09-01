@@ -51,18 +51,39 @@ public class PokerGame {
   }
 
   private Player round(int round) {
+    Scanner scanner = new Scanner(System.in);
     for (Player player : playerList) {
       int cardIndex = 0;
       if (player.getClass() == RealPlayer.class) {
+        if (player.getExchangeCount() == 0) {
+          System.out.println("交換手牌嗎？(Y/N)");
+          String change = scanner.next();
+          if (change.equalsIgnoreCase("y")) {
+            chaneHandCards(round, scanner, player);
+          }
+        } else if (player.getExchangeCount() == 1 && player.getHandCardExchange().changeBack(round)) {
+          System.out.println("交換回來");
+          player.exchangeHands(player.getHandCardExchange().getChangePlayer(), 0);
+        }
         System.out.println("選擇一張卡出卡：");
         player.showHandCards();
-        Scanner scanner = new Scanner(System.in);
         cardIndex = scanner.nextInt();
       }
       player.select(cardIndex);
       playGround.addCard(player, player.show());
     }
     return playGround.result();
+  }
+
+  private void chaneHandCards(int round, Scanner scanner, Player player) {
+    System.out.println("換幾號選手？");
+    for (int o = 0; o < playerList.size(); o++) {
+      System.out.println(o + ":" + playerList.get(o).getName());
+    }
+    int i = scanner.nextInt();
+    Player changeTargetPlayer = playerList.get(i);
+    player.exchangeHands(changeTargetPlayer, round);
+    System.out.println("交換成功囉");
   }
 
   private void playerDrawCard() {
